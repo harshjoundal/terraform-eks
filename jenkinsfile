@@ -40,13 +40,15 @@ pipeline{
         stage('Action'){
             steps{
                 withAWS(credentials:'aws-creds',region:'ap-south-1'){
-                    script {    
+                    script {
+                        def varFile = "${params.Environment}.tfvars"
+                        def workingDir = "eks"
                         if (params.Terraform_Action == 'plan') {
-                            sh "terraform -chdir=eks/ plan -var-file=${params.Environment}.tfvars"
-                        }   else if (params.Terraform_Action == 'apply') {
-                            sh "terraform -chdir=eks/ apply -var-file=${params.Environment}.tfvars -auto-approve"
-                        }   else if (params.Terraform_Action == 'destroy') {
-                            sh "terraform -chdir=eks/ destroy -var-file=${params.Environment}.tfvars -auto-approve"
+                            sh "terraform -chdir=${workingDir} plan -var-file=${varFile}"
+                        } else if (params.Terraform_Action == 'apply') {
+                            sh "terraform -chdir=${workingDir} apply -var-file=${varFile} -auto-approve"
+                        } else if (params.Terraform_Action == 'destroy') {
+                            sh "terraform -chdir=${workingDir} destroy -var-file=${varFile} -auto-approve"
                         } else {
                             error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
                         }
