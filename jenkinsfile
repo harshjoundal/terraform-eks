@@ -1,11 +1,11 @@
 properties([
     parameters([
         string(
-            defaultValue: 'dev'
+            defaultValue: 'dev',
             name: 'Environment'
         ),
         choice(
-            choices: ['plan','apply','destroy']
+            choices: ['plan','apply','destroy'],
             name: 'Terraform_Action'
         )
     ])
