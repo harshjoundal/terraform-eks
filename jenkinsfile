@@ -1,0 +1,60 @@
+properties([
+    parameters([
+        string(
+            defaultValue: 'dev'
+            name: 'Environment'
+        ),
+        choice(
+            choices: ['plan','apply','destroy']
+            name: 'Terraform_Action'
+        )
+    ])
+])
+pipeline{
+    agent any
+    stages {
+        stage('Preparing'){
+            steps {
+                sh 'echo Preparing'
+            }
+        }
+        stage('Git checkout'){
+            steps {
+                git branch: 'master',url: 'https://github.com/harshjoundal/terraform-eks.git'
+            }
+        }
+        stage('Init'){
+            steps {
+                withAWS(credentials:'aws-creds',region:'ap-south-1'){
+                    sh 'terraform -chdir=eks/ init'
+                }
+            }
+        }
+        stage('Validate'){
+            steps{
+                withAWS(credentials:'aws-creds',region:'ap-south-1'){
+                    sh 'terraform -chdir=eks/ validate'
+                }
+            }
+        }
+        stage('Action'){
+            steps{
+                withAWS(credentials:'aws-creds',region:'ap-south-1'){
+                    if(params.Terraform_Action == 'plan'){
+                        sh "terraform -chdir=eks/ -var-file=${params.Environment} plan"
+                    }
+                    else if(params.Terraform_Action == 'apply'){
+                        sh "terraform -chdir=eks/ -var-file=${params.Environment} apply"
+                    }
+                    else if(params.Terraform_Action == 'destroy'){
+                        sh "terraform -chdir=eks/ -var-file=${params.Environment} destroy"
+                    }
+                    else{
+                        error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
+                    }
+
+                }
+            }
+        }
+    }
+}
