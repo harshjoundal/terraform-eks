@@ -15,8 +15,8 @@ crash.log
 .terraform/
 
 # Variable configuration files (often contain sensitive data)
-*.tfvars
-*.tfvars.json
+# *.tfvars
+# *.tfvars.json
 
 # Backup files
 *.backup
