@@ -40,17 +40,19 @@ pipeline{
         stage('Action'){
             steps{
                 withAWS(credentials:'aws-creds',region:'ap-south-1'){
-                    if(params.Terraform_Action == 'plan'){
-                        sh "terraform -chdir=eks/ -var-file=${params.Environment} plan"
-                    }
-                    else if(params.Terraform_Action == 'apply'){
-                        sh "terraform -chdir=eks/ -var-file=${params.Environment} apply"
-                    }
-                    else if(params.Terraform_Action == 'destroy'){
-                        sh "terraform -chdir=eks/ -var-file=${params.Environment} destroy"
-                    }
-                    else{
-                        error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
+                    script{
+                        if(params.Terraform_Action == 'plan'){
+                            sh "terraform -chdir=eks/ -var-file=${params.Environment} plan"
+                        }
+                        else if(params.Terraform_Action == 'apply'){
+                            sh "terraform -chdir=eks/ -var-file=${params.Environment} apply"
+                        }
+                        else if(params.Terraform_Action == 'destroy'){
+                            sh "terraform -chdir=eks/ -var-file=${params.Environment} destroy"
+                        }
+                        else{
+                            error "Invalid value for Terraform_Action: ${params.Terraform_Action}"
+                        }
                     }
 
                 }
